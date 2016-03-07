@@ -1,0 +1,75 @@
+﻿<controls:MetroWindow x:Class="WinAppDeploy.GUI.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:local="clr-namespace:WinAppDeploy.GUI"
+                      mc:Ignorable="d"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      Title="WinAppDeploy" Height="350" Width="525"
+                      GlowBrush="Black"
+                      ResizeMode="CanResizeWithGrip"
+                      WindowStartupLocation="CenterScreen"
+                      SaveWindowPosition="True"
+                      xmlns:converters="clr-namespace:WinAppDeploy.GUI.Converters"
+                      DataContext="{Binding MainViewModel, Source={StaticResource Locator}}" >
+
+    <controls:MetroWindow.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </controls:MetroWindow.Resources>
+
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <Button Content="settings" Command="{Binding SettingsCommand}"/>
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+
+    <Grid>
+        <!--MAIN PANEL-->
+        <StackPanel
+            x:Name="MainGrid"
+            Visibility="{Binding IsCommandInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
+        </StackPanel>
+
+        <!--INSTALL SDK PANEL-->
+        <StackPanel x:Name="NotInstalledWarningGrid"
+                    Visibility="{Binding IsCommandInstalled, ConverterParameter=invert, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="25">
+            <TextBlock
+                x:Name="installSdkHelp"
+                HorizontalAlignment="Left"
+                TextWrapping="Wrap"
+                Text="You need the Windows 10 SDK in order to use the app. Please, download and install the Windows 10 SDK"
+                Margin="0,0,0,25" />
+            <Button
+                x:Name="downloadButton"
+                Content="Download Windows 10 SDK"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Command="{Binding InstallSdkCommand}"
+                Margin="0,0,0,25" />
+
+            <Button
+                x:Name="refreshCheckButton"
+                Click="ReInitialiseViewModel"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="55"
+                Height="55"
+                Style="{DynamicResource MetroCircleButtonStyle}">
+                <Rectangle Width="20" Height="20">
+                    <Rectangle.Fill>
+                        <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_refresh}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Button>
+        </StackPanel>
+        
+        
+        <Grid x:Name="loadingGrid" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource BlackColorBrush}" Opacity="0.2"/>
+            <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
+</controls:MetroWindow>
