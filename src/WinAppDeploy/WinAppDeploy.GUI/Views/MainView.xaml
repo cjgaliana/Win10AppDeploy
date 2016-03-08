@@ -1,47 +1,39 @@
-﻿<controls:MetroWindow x:Class="WinAppDeploy.GUI.MainWindow"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:local="clr-namespace:WinAppDeploy.GUI"
-                      mc:Ignorable="d"
-                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      Title="WinAppDeploy" Height="350" Width="525"
-                      GlowBrush="Black"
-                      ResizeMode="CanResizeWithGrip"
-                      WindowStartupLocation="CenterScreen"
-                      SaveWindowPosition="True"
-                      xmlns:converters="clr-namespace:WinAppDeploy.GUI.Converters"
-                      DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
-
-    <controls:MetroWindow.Resources>
+﻿<UserControl x:Class="WinAppDeploy.GUI.Views.MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinAppDeploy.GUI.Views"
+             xmlns:converters="clr-namespace:WinAppDeploy.GUI.Converters"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             >
+    
+    <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </controls:MetroWindow.Resources>
-
-    <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands>
-            <Button Content="settings" Command="{Binding SettingsCommand}" />
-        </controls:WindowCommands>
-    </controls:MetroWindow.RightWindowCommands>
+    </UserControl.Resources>
 
     <Grid>
         <!--MAIN PANEL-->
-        <StackPanel
+        <ScrollViewer>
+            <StackPanel
             x:Name="MainGrid"
             Visibility="{Binding IsCommandInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
+                <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
 
-            <DataGrid
+                <DataGrid
                 ItemsSource="{Binding Devices}"
                 SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
                 AutoGenerateColumns="True"
                 CanUserReorderColumns="False" />
-            <DataGrid ItemsSource="{Binding InstalledApps}" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Package" Binding="{Binding PackageName}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </StackPanel>
+                <DataGrid ItemsSource="{Binding InstalledApps}" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Package" Binding="{Binding PackageName}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+
 
         <!--INSTALL SDK PANEL-->
         <StackPanel x:Name="NotInstalledWarningGrid"
@@ -83,4 +75,4 @@
             <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
     </Grid>
-</controls:MetroWindow>
+</UserControl>

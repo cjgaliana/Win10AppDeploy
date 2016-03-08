@@ -1,15 +1,15 @@
+using Prism.Commands;
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
 using WinAppDeploy.GUI.Models;
 using WinAppDeploy.GUI.Services;
 
 namespace WinAppDeploy.GUI.ViewModel
 {
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : BaseViewModel
     {
         private readonly IDeployService _deployService;
 
@@ -18,6 +18,7 @@ namespace WinAppDeploy.GUI.ViewModel
         private IList<DeployTargetDevice> _devices;
         private DeployTargetDevice _selectedDevice;
         private IList<WinApp> _installedApps;
+
         public MainViewModel(IDeployService deployService)
         {
             this._deployService = deployService;
@@ -31,19 +32,19 @@ namespace WinAppDeploy.GUI.ViewModel
         public bool IsCommandInstalled
         {
             get { return this._isCommandInstalled; }
-            set { this.Set(() => this.IsCommandInstalled, ref this._isCommandInstalled, value); }
+            set { this.SetProperty(ref this._isCommandInstalled, value); }
         }
 
         public bool IsBusy
         {
             get { return this._isBusy; }
-            set { this.Set(() => this.IsBusy, ref this._isBusy, value); }
+            set { this.SetProperty(ref this._isBusy, value); }
         }
 
         public IList<DeployTargetDevice> Devices
         {
             get { return this._devices; }
-            set { this.Set(() => this.Devices, ref this._devices, value); }
+            set { this.SetProperty(ref this._devices, value); }
         }
 
         public DeployTargetDevice SelectedDevice
@@ -51,7 +52,7 @@ namespace WinAppDeploy.GUI.ViewModel
             get { return this._selectedDevice; }
             set
             {
-                this.Set(() => this.SelectedDevice, ref this._selectedDevice, value);
+                this.SetProperty(ref this._selectedDevice, value);
                 this.LoadAppsAsync();
             }
         }
@@ -61,15 +62,15 @@ namespace WinAppDeploy.GUI.ViewModel
         public IList<WinApp> InstalledApps
         {
             get { return this._installedApps; }
-            set { this.Set(() => this.InstalledApps, ref this._installedApps, value); }
+            set { this.SetProperty(ref this._installedApps, value); }
         }
 
         private void CreateCommands()
         {
-            this.RefreshDevicesCommand = new RelayCommand(async () => { await this.RefreshDevicesAsync(); });
-            this.InstallSdkCommand = new RelayCommand(this.OpenSdkWebSite);
+            this.RefreshDevicesCommand = new DelegateCommand(async () => { await this.RefreshDevicesAsync(); });
+            this.InstallSdkCommand = new DelegateCommand(this.OpenSdkWebSite);
             //this.SettingsCommand = new RelayCommand(Open Settings page);
-            this.TestCommand = new RelayCommand(async()=> { await this.LoadAppsAsync(); });
+            this.TestCommand = new DelegateCommand(async () => { await this.LoadAppsAsync(); });
         }
 
         private async Task LoadAppsAsync()

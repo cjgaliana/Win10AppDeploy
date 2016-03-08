@@ -1,18 +1,10 @@
 ﻿<Application
     x:Class="WinAppDeploy.GUI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:WinAppDeploy.GUI"
-    StartupUri="Views/MainWindow.xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    d1p1:Ignorable="d"
-    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:WinAppDeploy.GUI.ViewModel">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Application.Resources>
         <ResourceDictionary>
-            <!--ViewModel Locator-->
-            <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
 
             <!--Other Dictionaries-->
             <ResourceDictionary.MergedDictionaries>
@@ -25,7 +17,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <!--Extra Resources and icons-->
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
-
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
