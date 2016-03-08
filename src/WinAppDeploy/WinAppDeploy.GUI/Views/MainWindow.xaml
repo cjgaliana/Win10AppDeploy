@@ -31,11 +31,12 @@
             Visibility="{Binding IsCommandInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
             
-            <ListView ItemsSource="{Binding Devices}">
+            <ListView ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel>
+                        <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" />
+                            <Button Content="Test" Click="TestClick"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>

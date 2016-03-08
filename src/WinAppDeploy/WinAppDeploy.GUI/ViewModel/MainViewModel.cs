@@ -13,17 +13,14 @@ namespace WinAppDeploy.GUI.ViewModel
     {
         private readonly IDeployService _deployService;
 
-        private IList<DeployTargetDevice> _devices;
         private bool _isBusy;
-
         private bool _isCommandInstalled;
+        private IList<DeployTargetDevice> _devices;
+        private DeployTargetDevice _selectedDevice;
 
         public MainViewModel(IDeployService deployService)
         {
             this._deployService = deployService;
-
-            this.IsCommandInstalled = false;
-
             this.CreateCommands();
         }
 
@@ -49,11 +46,27 @@ namespace WinAppDeploy.GUI.ViewModel
             set { this.Set(() => this.Devices, ref this._devices, value); }
         }
 
+        public DeployTargetDevice SelectedDevice
+        {
+            get { return this._selectedDevice; }
+            set { this.Set(() => this.SelectedDevice, ref this._selectedDevice, value); }
+        }
+
+        public ICommand TestCommand { get; private set; }
+
         private void CreateCommands()
         {
             this.RefreshDevicesCommand = new RelayCommand(async () => { await this.RefreshDevicesAsync(); });
             this.InstallSdkCommand = new RelayCommand(this.OpenSdkWebSite);
-            //this.SettingsCommand = new RelayCommand(Open Settings page); 
+            //this.SettingsCommand = new RelayCommand(Open Settings page);
+            this.TestCommand = new RelayCommand(async()=> { await this.Test(); });
+        }
+
+        private async Task Test()
+        {
+            this.IsBusy = true;
+            var apps = await this._deployService.GetInstalledAppsAsync(this.SelectedDevice);
+            this.IsBusy = false;
         }
 
         private void OpenSdkWebSite()

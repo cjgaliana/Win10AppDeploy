@@ -21,5 +21,10 @@ namespace WinAppDeploy.GUI
         {
             await this.ViewModel.InitializeAsync();
         }
+
+        private void TestClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            this.ViewModel.TestCommand.Execute(null);
+        }
     }
 }

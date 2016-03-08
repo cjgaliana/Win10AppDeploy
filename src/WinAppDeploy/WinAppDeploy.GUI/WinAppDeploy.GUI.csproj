@@ -94,6 +94,7 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Extensions\ConsoleOutputExtensions.cs" />
     <Compile Include="Models\DeployTargetDevice.cs" />
+    <Compile Include="Models\WinApp.cs" />
     <Compile Include="Services\IDeployService.cs" />
     <Compile Include="Utils\RegexHelper.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />

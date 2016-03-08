@@ -22,7 +22,7 @@ namespace WinAppDeploy.GUI.Services
 
         Task UpdateAppAsync(string filePath, DeployTargetDevice device);
 
-        Task<IList<string>> GetInstalledAppsAsync(DeployTargetDevice device);
+        Task<IList<WinApp>> GetInstalledAppsAsync(DeployTargetDevice device);
     }
 
     public class Win10DeployService : IDeployService
@@ -113,17 +113,27 @@ namespace WinAppDeploy.GUI.Services
             // TODO: Parse devices
         }
 
-        public async Task<IList<string>> GetInstalledAppsAsync(DeployTargetDevice device)
+        public async Task<IList<WinApp>> GetInstalledAppsAsync(DeployTargetDevice device)
         {
-            var result = await this.RunWinAppDeployCmdAsync(
+            var result = await this.RunApp(-1,
                 "list",
                 $"-ip {device.Ip}");
 
             // TODO: Process output
-            var sanizited = result.CleanHeader().CleanFooter();
-            // TODO: Parse devices
+            var sanizited = result.CleanHeader().CleanFooter().CleanListingHeader().CleanListingFooter().Trim();
+            // TODO: Parse apps
+            var apps = new List<WinApp>();
 
-            return new List<string>();
+            var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
+
+            foreach (var line in lines)
+            {
+                var name = line.Trim();
+                var app = new WinApp { PackageName = name };
+                apps.Add(app);
+            }
+
+            return apps;
         }
 
         private Task<string> RunWinAppDeployCmdAsync(params string[] arguments)
@@ -131,19 +141,25 @@ namespace WinAppDeploy.GUI.Services
             return this.RunApp(3, arguments);
         }
 
-        private Task<string> RunApp(int timeoutInSecods, params string[] arguments)
+        private Task<string> RunApp(int timeoutInSeconds, params string[] arguments)
         {
             return Task.Run(() =>
             {
                 var defaultPath = @"C:\Program Files (x86)\Windows Kits\10\bin\x86";
                 var execName = "WinAppDeployCmd.exe";
 
+                var cmdArguments = string.Join(" ", arguments);
+                if (timeoutInSeconds > 0)
+                {
+                    cmdArguments += " " + timeoutInSeconds;
+                }
+
                 var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = Path.Combine(defaultPath, execName),
-                        Arguments = string.Join(" ", arguments) + " " + timeoutInSecods,
+                        Arguments = cmdArguments,
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true
