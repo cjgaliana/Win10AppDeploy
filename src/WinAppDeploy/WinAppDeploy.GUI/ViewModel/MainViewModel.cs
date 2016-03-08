@@ -1,9 +1,10 @@
-using System;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using WinAppDeploy.GUI.Models;
 using WinAppDeploy.GUI.Services;
 
 namespace WinAppDeploy.GUI.ViewModel
@@ -12,8 +13,10 @@ namespace WinAppDeploy.GUI.ViewModel
     {
         private readonly IDeployService _deployService;
 
-        private bool _isCommandInstalled;
+        private IList<DeployTargetDevice> _devices;
         private bool _isBusy;
+
+        private bool _isCommandInstalled;
 
         public MainViewModel(IDeployService deployService)
         {
@@ -40,6 +43,12 @@ namespace WinAppDeploy.GUI.ViewModel
             set { this.Set(() => this.IsBusy, ref this._isBusy, value); }
         }
 
+        public IList<DeployTargetDevice> Devices
+        {
+            get { return this._devices; }
+            set { this.Set(() => this.Devices, ref this._devices, value); }
+        }
+
         private void CreateCommands()
         {
             this.RefreshDevicesCommand = new RelayCommand(async () => { await this.RefreshDevicesAsync(); });
@@ -63,7 +72,8 @@ namespace WinAppDeploy.GUI.ViewModel
         private async Task RefreshDevicesAsync()
         {
             this.IsBusy = true;
-            var devices = await this._deployService.GetDevicesAsync();
+            this.Devices = await this._deployService.GetDevicesAsync();
+
             this.IsBusy = false;
         }
     }

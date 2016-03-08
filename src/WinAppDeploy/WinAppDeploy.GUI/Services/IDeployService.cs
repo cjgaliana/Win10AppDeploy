@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WinAppDeploy.GUI.Extensions;
 using WinAppDeploy.GUI.Models;
+using WinAppDeploy.GUI.Utils;
 
 namespace WinAppDeploy.GUI.Services
 {
@@ -41,12 +43,33 @@ namespace WinAppDeploy.GUI.Services
 
         public async Task<IList<DeployTargetDevice>> GetDevicesAsync()
         {
-            var result = await this.RunWinAppDeployCmdAsync("devices 3");
+            var devices = new List<DeployTargetDevice>();
+
+            var result = await this.RunWinAppDeployCmdAsync("devices");
             // TODO: Process output
             var sanizited = result.CleanHeader().CleanFooter();
             // TODO: Parse devices
+            var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
 
-            return new List<DeployTargetDevice>();
+            foreach (var line in lines)
+            {
+                if (line.IsDeviceInfo())
+                {
+                    var ip = Regex.Match(line, RegexHelper.IpPattern).Value;
+                    var guid = Regex.Match(line, RegexHelper.GuidPattern).Value;
+                    var name = Regex.Match(line, "(?<=^((\\S)*\\s){2}).*").Value.Trim(); // Capture the device name, but not the IP, the GUID or the final \r
+
+                    var device = new DeployTargetDevice
+                    {
+                        Guid = guid,
+                        Ip = ip,
+                        Name = name
+                    };
+                    devices.Add(device);
+                }
+            }
+
+            return devices;
         }
 
         public async Task InstallAppAsync(string filePath, DeployTargetDevice device)
@@ -105,6 +128,11 @@ namespace WinAppDeploy.GUI.Services
 
         private Task<string> RunWinAppDeployCmdAsync(params string[] arguments)
         {
+            return this.RunApp(3, arguments);
+        }
+
+        private Task<string> RunApp(int timeoutInSecods, params string[] arguments)
+        {
             return Task.Run(() =>
             {
                 var defaultPath = @"C:\Program Files (x86)\Windows Kits\10\bin\x86";
@@ -115,7 +143,7 @@ namespace WinAppDeploy.GUI.Services
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = Path.Combine(defaultPath, execName),
-                        Arguments = string.Join(" ", arguments),
+                        Arguments = string.Join(" ", arguments) + " " + timeoutInSecods,
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using WinAppDeploy.GUI.Utils;
 
 namespace WinAppDeploy.GUI.Extensions
 {
@@ -16,6 +17,14 @@ namespace WinAppDeploy.GUI.Extensions
         {
             var pattern = "Done(\\.)?(\\s)?$"; //Done at the end of the string
             var final = Regex.Replace(input, pattern, "");
+
+            return final;
+        }
+
+        public static bool IsDeviceInfo(this string input)
+        {
+            var pattern = string.Concat("^", RegexHelper.IpPattern); // Start by an IP
+            var final = Regex.IsMatch(input, pattern);
 
             return final;
         }

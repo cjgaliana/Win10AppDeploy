@@ -4,5 +4,6 @@
     {
         public string Ip;
         public string Guid { get; set; }
+        public string Name { get; set; }
     }
 }
