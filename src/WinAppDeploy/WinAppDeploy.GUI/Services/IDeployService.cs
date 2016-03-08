@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WinAppDeploy.GUI.Extensions;
@@ -32,44 +33,56 @@ namespace WinAppDeploy.GUI.Services
             try
             {
                 var output = await this.RunWinAppDeployCmdAsync();
+                return true;
             }
             catch (Exception exception)
             {
                 return false;
             }
-
-            return true;
         }
 
         public async Task<IList<DeployTargetDevice>> GetDevicesAsync()
         {
-            var devices = new List<DeployTargetDevice>();
+            var result = await this.RunWinAppDeployCmdAsync(
+                "devices", //cmd
+                "5" // Timeout
+                );
 
-            var result = await this.RunWinAppDeployCmdAsync("devices");
-            // TODO: Process output
+            // Sanitize string
             var sanizited = result.CleanHeader().CleanFooter();
-            // TODO: Parse devices
+
+            // Parse lines
             var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
-
-            foreach (var line in lines)
-            {
-                if (line.IsDeviceInfo())
+            var devices = lines
+                .Where(x => x.IsDeviceInfo())
+                .Select(item => new DeployTargetDevice
                 {
-                    var ip = Regex.Match(line, RegexHelper.IpPattern).Value;
-                    var guid = Regex.Match(line, RegexHelper.GuidPattern).Value;
-                    var name = Regex.Match(line, "(?<=^((\\S)*\\s){2}).*").Value.Trim(); // Capture the device name, but not the IP, the GUID or the final \r
-
-                    var device = new DeployTargetDevice
-                    {
-                        Guid = guid,
-                        Ip = ip,
-                        Name = name
-                    };
-                    devices.Add(device);
-                }
-            }
+                    Guid = Regex.Match(item, RegexHelper.GuidPattern).Value,
+                    IP = Regex.Match(item, RegexHelper.IpPattern).Value,
+                    Name = Regex.Match(item, "(?<=^((\\S)*\\s){2}).*").Value.Trim()
+                })
+                .ToList();
 
             return devices;
+        }
+
+        public async Task<IList<WinApp>> GetInstalledAppsAsync(DeployTargetDevice device)
+        {
+            var result = await this.RunWinAppDeployCmdAsync(
+                "list",
+                $"-ip {device.IP}");
+
+            var sanizited = result.CleanHeader().CleanFooter().CleanListingHeader().CleanListingFooter().Trim();
+
+            var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
+
+            var apps = lines
+                .Select(name => new WinApp
+                {
+                    PackageName = name.Trim()
+                })
+                .ToList();
+            return apps;
         }
 
         public async Task InstallAppAsync(string filePath, DeployTargetDevice device)
@@ -77,7 +90,7 @@ namespace WinAppDeploy.GUI.Services
             var result = await this.RunWinAppDeployCmdAsync(
                 "install",
                 $"-file {filePath}",
-                $"-ip {device.Ip}",
+                $"-ip {device.IP}",
                 $"-guid {device.Guid}" //,
                                        //$"-pin {pin}"
                 );
@@ -92,7 +105,7 @@ namespace WinAppDeploy.GUI.Services
             var result = await this.RunWinAppDeployCmdAsync(
                 "uninstall",
                 $"-file {filePath}",
-                $"-package {device.Ip}"
+                $"-package {device.IP}"
                 );
 
             // TODO: Process output
@@ -103,45 +116,19 @@ namespace WinAppDeploy.GUI.Services
         public async Task UpdateAppAsync(string filePath, DeployTargetDevice device)
         {
             var result = await this.RunWinAppDeployCmdAsync(
-              "update",
-              $"-file {filePath}",
-              $"-ip {device.Ip}"
-              );
+                "update",
+                $"-file {filePath}",
+                $"-ip {device.IP}"
+                );
 
             // TODO: Process output
             var sanizited = result.CleanHeader().CleanFooter();
             // TODO: Parse devices
         }
 
-        public async Task<IList<WinApp>> GetInstalledAppsAsync(DeployTargetDevice device)
-        {
-            var result = await this.RunApp(-1,
-                "list",
-                $"-ip {device.Ip}");
-
-            // TODO: Process output
-            var sanizited = result.CleanHeader().CleanFooter().CleanListingHeader().CleanListingFooter().Trim();
-            // TODO: Parse apps
-            var apps = new List<WinApp>();
-
-            var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
-
-            foreach (var line in lines)
-            {
-                var name = line.Trim();
-                var app = new WinApp { PackageName = name };
-                apps.Add(app);
-            }
-
-            return apps;
-        }
+   
 
         private Task<string> RunWinAppDeployCmdAsync(params string[] arguments)
-        {
-            return this.RunApp(3, arguments);
-        }
-
-        private Task<string> RunApp(int timeoutInSeconds, params string[] arguments)
         {
             return Task.Run(() =>
             {
@@ -149,10 +136,6 @@ namespace WinAppDeploy.GUI.Services
                 var execName = "WinAppDeployCmd.exe";
 
                 var cmdArguments = string.Join(" ", arguments);
-                if (timeoutInSeconds > 0)
-                {
-                    cmdArguments += " " + timeoutInSeconds;
-                }
 
                 var proc = new Process
                 {

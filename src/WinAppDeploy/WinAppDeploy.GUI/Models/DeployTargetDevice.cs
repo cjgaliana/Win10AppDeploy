@@ -2,8 +2,9 @@
 {
     public class DeployTargetDevice
     {
-        public string Ip;
-        public string Guid { get; set; }
         public string Name { get; set; }
+
+        public string IP { get; set; }
+        public string Guid { get; set; }
     }
 }

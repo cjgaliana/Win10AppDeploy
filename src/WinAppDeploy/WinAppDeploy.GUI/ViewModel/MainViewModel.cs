@@ -17,7 +17,7 @@ namespace WinAppDeploy.GUI.ViewModel
         private bool _isCommandInstalled;
         private IList<DeployTargetDevice> _devices;
         private DeployTargetDevice _selectedDevice;
-
+        private IList<WinApp> _installedApps;
         public MainViewModel(IDeployService deployService)
         {
             this._deployService = deployService;
@@ -49,23 +49,39 @@ namespace WinAppDeploy.GUI.ViewModel
         public DeployTargetDevice SelectedDevice
         {
             get { return this._selectedDevice; }
-            set { this.Set(() => this.SelectedDevice, ref this._selectedDevice, value); }
+            set
+            {
+                this.Set(() => this.SelectedDevice, ref this._selectedDevice, value);
+                this.LoadAppsAsync();
+            }
         }
 
         public ICommand TestCommand { get; private set; }
+
+        public IList<WinApp> InstalledApps
+        {
+            get { return this._installedApps; }
+            set { this.Set(() => this.InstalledApps, ref this._installedApps, value); }
+        }
 
         private void CreateCommands()
         {
             this.RefreshDevicesCommand = new RelayCommand(async () => { await this.RefreshDevicesAsync(); });
             this.InstallSdkCommand = new RelayCommand(this.OpenSdkWebSite);
             //this.SettingsCommand = new RelayCommand(Open Settings page);
-            this.TestCommand = new RelayCommand(async()=> { await this.Test(); });
+            this.TestCommand = new RelayCommand(async()=> { await this.LoadAppsAsync(); });
         }
 
-        private async Task Test()
+        private async Task LoadAppsAsync()
         {
+            if (this.SelectedDevice == null)
+            {
+                return;
+            }
+
             this.IsBusy = true;
             var apps = await this._deployService.GetInstalledAppsAsync(this.SelectedDevice);
+            this.InstalledApps = apps;
             this.IsBusy = false;
         }
 

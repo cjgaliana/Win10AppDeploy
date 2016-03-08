@@ -12,7 +12,7 @@
                       WindowStartupLocation="CenterScreen"
                       SaveWindowPosition="True"
                       xmlns:converters="clr-namespace:WinAppDeploy.GUI.Converters"
-                      DataContext="{Binding MainViewModel, Source={StaticResource Locator}}" >
+                      DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
 
     <controls:MetroWindow.Resources>
         <converters:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -20,7 +20,7 @@
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
-            <Button Content="settings" Command="{Binding SettingsCommand}"/>
+            <Button Content="settings" Command="{Binding SettingsCommand}" />
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 
@@ -30,18 +30,17 @@
             x:Name="MainGrid"
             Visibility="{Binding IsCommandInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
-            
-            <ListView ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
-                            <Button Content="Test" Click="TestClick"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-            
+
+            <DataGrid
+                ItemsSource="{Binding Devices}"
+                SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                AutoGenerateColumns="True"
+                CanUserReorderColumns="False" />
+            <DataGrid ItemsSource="{Binding InstalledApps}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Package" Binding="{Binding PackageName}" />
+                </DataGrid.Columns>
+            </DataGrid>
         </StackPanel>
 
         <!--INSTALL SDK PANEL-->
@@ -77,11 +76,11 @@
                 </Rectangle>
             </Button>
         </StackPanel>
-        
+
         <!--LOADING GRID-->
         <Grid x:Name="loadingGrid" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource BlackColorBrush}" Opacity="0.2"/>
-            <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource BlackColorBrush}" Opacity="0.2" />
+            <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
     </Grid>
 </controls:MetroWindow>
