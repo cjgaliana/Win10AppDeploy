@@ -30,6 +30,12 @@ namespace WinAppDeploy.GUI.ViewModels
             set { this.Set(() => this.InstalledApps, ref this._installedApps, value); }
         }
 
+        public WinApp SelectedApp
+        {
+            get { return this._selectedApp; }
+            set { this.Set(() => this.SelectedApp, ref this._selectedApp, value); }
+        }
+
         public async Task InitializeAsync()
         {
             var device = this._navigationService.NavigationParameter as DeployTargetDevice;
@@ -52,5 +58,6 @@ namespace WinAppDeploy.GUI.ViewModels
 
         private DeployTargetDevice _device;
         private IList<WinApp> _installedApps;
+        private WinApp _selectedApp;
     }
 }

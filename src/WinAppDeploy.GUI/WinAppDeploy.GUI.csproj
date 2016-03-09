@@ -92,6 +92,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Messages\BusyMessage.cs" />
     <Compile Include="Services\IDeployService.cs" />
     <Compile Include="Services\INavigationService.cs" />
@@ -140,8 +141,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DeviceDetailsView.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\DevicesPage.xaml">
       <SubType>Designer</SubType>

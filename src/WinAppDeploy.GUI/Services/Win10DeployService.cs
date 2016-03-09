@@ -39,7 +39,7 @@ namespace WinAppDeploy.GUI.Services
             // Parse lines
             var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
             var devices = lines
-                .Where(x => ConsoleOutputExtensions.IsDeviceInfo(x))
+                .Where(x => x.IsDeviceInfo())
                 .Select(item => new DeployTargetDevice
                 {
                     Guid = Regex.Match(item, RegexHelper.GuidPattern).Value,
@@ -69,27 +69,6 @@ namespace WinAppDeploy.GUI.Services
                 })
                 .ToList();
             return apps;
-        }
-
-        private string GetAppArchitecture(string packageName)
-        {
-            if (packageName.ToLowerInvariant().Contains("_arm_".ToLowerInvariant()))
-            {
-                return "ARM";
-            }
-
-            if (packageName.ToLowerInvariant().Contains("_x64_".ToLowerInvariant()))
-            {
-                return "x64";
-            }
-
-            if (packageName.ToLowerInvariant().Contains("_neutral_".ToLowerInvariant()))
-            {
-                return "Any CPU";
-            }
-
-
-            return "x86";
         }
 
         public async Task InstallAppAsync(string filePath, DeployTargetDevice device)
@@ -133,7 +112,25 @@ namespace WinAppDeploy.GUI.Services
             // TODO: Parse devices
         }
 
+        private string GetAppArchitecture(string packageName)
+        {
+            if (packageName.ToLowerInvariant().Contains("_arm_".ToLowerInvariant()))
+            {
+                return "ARM";
+            }
 
+            if (packageName.ToLowerInvariant().Contains("_x64_".ToLowerInvariant()))
+            {
+                return "x64";
+            }
+
+            if (packageName.ToLowerInvariant().Contains("_neutral_".ToLowerInvariant()))
+            {
+                return "Any CPU";
+            }
+
+            return "x86";
+        }
 
         private Task<string> RunWinAppDeployCmdAsync(params string[] arguments)
         {
