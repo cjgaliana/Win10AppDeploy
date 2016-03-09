@@ -16,7 +16,7 @@
         <StackPanel>
             <StackPanel Orientation="Horizontal">
                 <!--<Button Content="Install new app" Style="{StaticResource AccentedSquareButtonStyle}" />-->
-                <Button Content="Install new app" Margin="12" />
+                <Button Content="Install new app" Margin="12" Command="{Binding InstallNewAppCommand}"/>
                 <Button Content="Update" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
                 <Button Content="Unistall" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
             </StackPanel>
