@@ -40,7 +40,7 @@ namespace WinAppDeploy.GUI.ViewModels
             set
             {
                 this.Set(() => this.SelectedDevice, ref this._selectedDevice, value);
-                this.LoadAppsAsync();
+                this._navigationService.NavigateTo(PageKey.DeviceDetails, value);
             }
         }
 
@@ -78,6 +78,7 @@ namespace WinAppDeploy.GUI.ViewModels
         public async Task InitializeAsync()
         {
             // TODO: Load data
+            await this.RefreshDevicesAsync();
         }
 
         private async Task RefreshDevicesAsync()

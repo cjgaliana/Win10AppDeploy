@@ -64,10 +64,32 @@ namespace WinAppDeploy.GUI.Services
             var apps = lines
                 .Select(name => new WinApp
                 {
-                    PackageName = name.Trim()
+                    PackageName = name.Trim(),
+                    Architecture = this.GetAppArchitecture(name)
                 })
                 .ToList();
             return apps;
+        }
+
+        private string GetAppArchitecture(string packageName)
+        {
+            if (packageName.ToLowerInvariant().Contains("_arm_".ToLowerInvariant()))
+            {
+                return "ARM";
+            }
+
+            if (packageName.ToLowerInvariant().Contains("_x64_".ToLowerInvariant()))
+            {
+                return "x64";
+            }
+
+            if (packageName.ToLowerInvariant().Contains("_neutral_".ToLowerInvariant()))
+            {
+                return "Any CPU";
+            }
+
+
+            return "x86";
         }
 
         public async Task InstallAppAsync(string filePath, DeployTargetDevice device)

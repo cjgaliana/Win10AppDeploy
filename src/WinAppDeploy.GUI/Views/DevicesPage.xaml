@@ -1,24 +1,24 @@
 ﻿<UserControl x:Class="WinAppDeploy.GUI.Views.DevicesPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:WinAppDeploy.GUI.Views"
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:converters="clr-namespace:WinAppDeploy.GUI.Converters"
-      mc:Ignorable="d" 
+      mc:Ignorable="d"
       d:DesignHeight="300" d:DesignWidth="300"
       DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}">
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    
-    <Grid Background="Red">
+
+    <Grid>
         <StackPanel
-            x:Name="MainGrid"
-            Visibility="{Binding IsCommandInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+            x:Name="MainGrid">
             <Button Command="{Binding RefreshDevicesCommand}" Content="RefreshDevices" />
+            <DataGrid ItemsSource="{Binding Devices}" AutoGenerateColumns="True" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" />
         </StackPanel>
     </Grid>
 </UserControl>

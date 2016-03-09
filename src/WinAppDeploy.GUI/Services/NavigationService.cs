@@ -17,7 +17,8 @@ namespace WinAppDeploy.GUI.Services
             {
                 {PageKey.DevicesPage, typeof (DevicesPage)},
                 {PageKey.SDKError, typeof (SDKErrorView)},
-                {PageKey.SplashView, typeof (SplashView)}
+                {PageKey.SplashView, typeof (SplashView)},
+                {PageKey.DeviceDetails, typeof (DeviceDetailsView)}
             };
         }
 
@@ -31,6 +32,7 @@ namespace WinAppDeploy.GUI.Services
             this._currentFrame = mainFrame;
         }
 
+        public object NavigationParameter { get; private set; }
         public bool CanGoBack => this._currentFrame.CanGoBack;
 
         public void GoBack()
@@ -71,7 +73,10 @@ namespace WinAppDeploy.GUI.Services
                 }
             }
 
-            this._currentFrame.Navigate(new Uri($"/Views/{page.Name}.xaml", UriKind.Relative), parameter);
+
+            this.NavigationParameter = parameter;
+            //this._currentFrame.Navigate(new Uri($"/Views/{page.Name}.xaml", UriKind.Relative), parameter);
+            this._currentFrame.Navigate(new Uri($"/Views/{page.Name}.xaml", UriKind.Relative));
         }
     }
 }

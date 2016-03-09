@@ -102,6 +102,7 @@
     </Compile>
     <Compile Include="Utils\RegexHelper.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\DeviceDetailsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SplashViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
@@ -113,6 +114,9 @@
     <Compile Include="Extensions\ConsoleOutputExtensions.cs" />
     <Compile Include="Views\BusyIndicator.xaml.cs">
       <DependentUpon>BusyIndicator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DeviceDetailsView.xaml.cs">
+      <DependentUpon>DeviceDetailsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DevicesPage.xaml.cs">
       <DependentUpon>DevicesPage.xaml</DependentUpon>
@@ -132,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BusyIndicator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DeviceDetailsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

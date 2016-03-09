@@ -6,11 +6,14 @@ namespace WinAppDeploy.GUI.Services
     {
         SDKError,
         DevicesPage,
-        SplashView
+        SplashView,
+        DeviceDetails
     }
 
     public interface INavigationService
     {
+        object NavigationParameter { get; }
+
         bool CanGoBack { get; }
 
         void InitializeFrame(Frame mainFrame);

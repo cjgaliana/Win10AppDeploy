@@ -42,7 +42,9 @@ namespace WinAppDeploy.GUI
 
         private void RegisterViewModels()
         {
+            this._container.RegisterType<SplashViewModel>();
             this._container.RegisterType<MainViewModel>();
+            this._container.RegisterType<DeviceDetailsViewModel>();
         }
     }
 }
