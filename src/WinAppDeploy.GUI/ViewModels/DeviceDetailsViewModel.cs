@@ -28,6 +28,7 @@ namespace WinAppDeploy.GUI.ViewModels
         {
             this.InstallNewAppCommand = new RelayCommand(async () => { await this.InstallAppAsync(); });
             this.UnistallCommand = new RelayCommand(async () => { await this.UnistallAppAsync(); });
+            this.UpdateAppCommand = new RelayCommand(async () => { await this.UpdateAppAsync(); });
         }
 
         private async Task UnistallAppAsync()
@@ -75,6 +76,35 @@ namespace WinAppDeploy.GUI.ViewModels
             }
         }
 
+        private async Task UpdateAppAsync()
+        {
+            try
+            {
+                if (this.SelectedApp == null)
+                {
+                    return;
+                }
+
+                var appPath = this.PickFile();
+                if (string.IsNullOrWhiteSpace(appPath))
+                {
+                    return;
+                }
+
+                this.IsBusy = true;
+                await this._deployService.UpdateAppAsync(appPath, this.Device);
+                await this.LoadAppsAsync();
+            }
+            catch (Exception ex)
+            {
+                var a = 5;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
         private string PickFile()
         {
             var openFileDialog = new OpenFileDialog();
@@ -91,6 +121,7 @@ namespace WinAppDeploy.GUI.ViewModels
 
         public ICommand InstallNewAppCommand { get; private set; }
         public ICommand UnistallCommand { get; private set; }
+        public ICommand UpdateAppCommand { get; private set; }
 
         public DeployTargetDevice Device
         {
@@ -160,7 +191,7 @@ namespace WinAppDeploy.GUI.ViewModels
             this.IsBusy = true;
             var apps = await this._deployService.GetInstalledAppsAsync(this.Device);
             this.InstalledApps = apps;
-            await this.FilterAppsAsync(string.Empty);
+            this.QueryString = string.Empty;
             this.IsBusy = false;
         }
 

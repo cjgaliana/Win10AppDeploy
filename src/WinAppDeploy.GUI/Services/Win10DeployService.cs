@@ -121,7 +121,7 @@ namespace WinAppDeploy.GUI.Services
         {
             var result = await this.RunWinAppDeployCmdAsync(
                 "update",
-                $"-file {filePath}",
+                $"-file \"{filePath}\"",
                 $"-ip {device.IP}"
                 );
 

@@ -20,7 +20,7 @@
             <StackPanel Orientation="Horizontal">
                 <!--<Button Content="Install new app" Style="{StaticResource AccentedSquareButtonStyle}" />-->
                 <Button Content="Install new app" Margin="12" Command="{Binding InstallNewAppCommand}" />
-                <Button Content="Update" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
+                <Button Content="Update" Command="{Binding UpdateAppCommand}" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
                 <Button Content="Unistall" Command="{Binding UnistallCommand}" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
                 <TextBox Text="{Binding QueryString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6, 12" Width="250"/>
             </StackPanel>
