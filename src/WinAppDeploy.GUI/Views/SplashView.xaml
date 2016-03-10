@@ -11,7 +11,7 @@
     <Grid>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <controls:ProgressRing Foreground="{DynamicResource AccentColorBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,0,10"/>
-            <TextBlock Text="Checking Windows 10 SDK..." HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding LoadingMessage}" HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </UserControl>
