@@ -1,7 +1,9 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using System;
+using GalaSoft.MvvmLight.CommandWpf;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Squirrel;
 using WinAppDeploy.GUI.Services;
 
 namespace WinAppDeploy.GUI.ViewModels
@@ -17,7 +19,10 @@ namespace WinAppDeploy.GUI.ViewModels
             this._deployService = deployService;
 
             this.CreateCommands();
+
         }
+
+       
 
         public ICommand RefreshCommand { get; private set; }
         public ICommand InstallSdkCommand { get; private set; }
@@ -35,8 +40,29 @@ namespace WinAppDeploy.GUI.ViewModels
 
         public async Task InitializeAsync()
         {
+            // Check for app updates
+            await this.CheckForUpdatesAsync();
+
+            // Check for the Windows 10 SDK
             var isInstalled = await this._deployService.IsSDKInstalledAsync();
             this._navigationService.NavigateTo(isInstalled ? PageKey.DevicesPage : PageKey.SDKError);
+        }
+
+        private async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                var updateUrl = "https://github.com/cjgaliana/Win10AppDeploy";
+                using (var updateManager = UpdateManager.GitHubUpdateManager(updateUrl))
+                {
+                    await updateManager.Result.UpdateApp();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Silent errors
+            }
+          
         }
     }
 }
