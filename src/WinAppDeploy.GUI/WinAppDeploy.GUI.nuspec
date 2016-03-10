@@ -1,0 +1,16 @@
+<package>
+  <metadata>
+    <id>WinAppDeploy</id>
+    <version>1.0.0.0</version>
+    <authors>cjgaliana</authors>
+    <owners>cjgaliana</owners>
+    <licenseUrl>https://github.com/cjgaliana/Win10AppDeploy/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/cjgaliana/Win10AppDeploy</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Windows GUI for the WinAppDeployCmd tool</description>
+    <releaseNotes></releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\*.*" target="lib\net45\" exclude="bin\release\*.pdb;bin\release\*.nupkg;bin\release\*.vshost.*"/>
+  </files>
+</package>
