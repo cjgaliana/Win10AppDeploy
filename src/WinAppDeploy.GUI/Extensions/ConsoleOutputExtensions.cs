@@ -36,6 +36,11 @@ namespace WinAppDeploy.GUI.Extensions
             return final;
         }
 
+        public static bool IsCmdOperationSuccess(this string input)
+        {
+            return input.ToLowerInvariant().Contains("Remote action succeeded".ToLowerInvariant());
+        }
+
         #endregion devices cmd
 
         #region list cmd
@@ -63,5 +68,23 @@ namespace WinAppDeploy.GUI.Extensions
         }
 
         #endregion list cmd
+
+        #region install cmd
+
+        public static string GetInstallError(this string input)
+        {
+            //var pattern = "(?<=Disconnecting\\.[\\s\\r\\n]*).*"; // Select everything after the word "Disconnecting."
+            //var final = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+
+            //return final.Value;
+
+            var word = "Disconnecting.";
+            var index = input.LastIndexOf(word);
+
+            var final = input.Substring(index + word.Length).Trim();
+            return final;
+        }
+
+        #endregion install cmd
     }
 }

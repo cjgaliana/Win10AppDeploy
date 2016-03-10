@@ -13,19 +13,28 @@
     </UserControl.Resources>
 
     <Grid>
-        <StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <!--<Button Content="Install new app" Style="{StaticResource AccentedSquareButtonStyle}" />-->
-                <Button Content="Install new app" Margin="12" Command="{Binding InstallNewAppCommand}"/>
+                <Button Content="Install new app" Margin="12" Command="{Binding InstallNewAppCommand}" />
                 <Button Content="Update" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
-                <Button Content="Unistall" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
+                <Button Content="Unistall" Command="{Binding UnistallCommand}" IsEnabled="{Binding SelectedApp, Converter={StaticResource NullToBooleanConverter}}"  Margin="6, 12" />
+                <TextBox Text="{Binding QueryString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6, 12" Width="250"/>
             </StackPanel>
-            <DataGrid ItemsSource="{Binding InstalledApps}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedApp, Mode=TwoWay}">
+
+            <DataGrid 
+                ItemsSource="{Binding FilteredInstalledApps}" 
+                AutoGenerateColumns="False" 
+                SelectedItem="{Binding SelectedApp, Mode=TwoWay}"
+                Grid.Row="1">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Package name" Binding="{Binding PackageName}"></DataGridTextColumn>
                     <DataGridTextColumn Header="Architecture" Binding="{Binding Architecture}"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
-        </StackPanel>
+        
     </Grid>
 </UserControl>

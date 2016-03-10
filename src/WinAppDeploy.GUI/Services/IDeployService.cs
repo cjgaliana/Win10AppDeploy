@@ -6,13 +6,15 @@ namespace WinAppDeploy.GUI.Services
 {
     public interface IDeployService
     {
+        CmdResult LastCmdRunResukt { get; }
+
         Task<bool> IsSDKInstalledAsync();
 
         Task<IList<DeployTargetDevice>> GetDevicesAsync();
 
         Task InstallAppAsync(string filePath, DeployTargetDevice device);
 
-        Task UnistallAppAsync(string filePath, DeployTargetDevice device);
+        Task UnistallAppAsync(WinApp winApp, DeployTargetDevice device);
 
         Task UpdateAppAsync(string filePath, DeployTargetDevice device);
 

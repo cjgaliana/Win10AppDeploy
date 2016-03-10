@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using GalaSoft.MvvmLight.CommandWpf;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using GalaSoft.MvvmLight.CommandWpf;
-using Microsoft.Win32;
 using WinAppDeploy.GUI.Models;
 using WinAppDeploy.GUI.Services;
 
@@ -26,7 +26,31 @@ namespace WinAppDeploy.GUI.ViewModels
 
         private void CreateCommands()
         {
-            this.InstallNewAppCommand = new RelayCommand(async()=> { await this.InstallAppAsync(); });
+            this.InstallNewAppCommand = new RelayCommand(async () => { await this.InstallAppAsync(); });
+            this.UnistallCommand = new RelayCommand(async () => { await this.UnistallAppAsync(); });
+        }
+
+        private async Task UnistallAppAsync()
+        {
+            try
+            {
+                if (this.SelectedApp == null)
+                {
+                    return;
+                }
+
+                this.IsBusy = true;
+                await this._deployService.UnistallAppAsync(this.SelectedApp, this.Device);
+                await this.LoadAppsAsync();
+            }
+            catch (Exception ex)
+            {
+                var a = 5;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         private async Task InstallAppAsync()
@@ -36,23 +60,37 @@ namespace WinAppDeploy.GUI.ViewModels
             {
                 return;
             }
-            await this._deployService.InstallAppAsync(appPath, this.Device);
+            try
+            {
+                this.IsBusy = true;
+                await this._deployService.InstallAppAsync(appPath, this.Device);
+            }
+            catch (Exception ex)
+            {
+                var a = 5;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         private string PickFile()
         {
             var openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "App Packages (*.appx)|*.appx|All files (*.*)|*.*"; 
+            openFileDialog.Filter = "App Packages (*.appx;*.appxbundle)|*.appx;*appxbundle|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                return openFileDialog.FileName;
+                var fileName = openFileDialog.FileName;
+                fileName = Regex.Replace(fileName, "\\\\", "\\");
+                return fileName;
             }
 
             return "";
         }
 
-
         public ICommand InstallNewAppCommand { get; private set; }
+        public ICommand UnistallCommand { get; private set; }
 
         public DeployTargetDevice Device
         {
@@ -72,6 +110,39 @@ namespace WinAppDeploy.GUI.ViewModels
             set { this.Set(() => this.SelectedApp, ref this._selectedApp, value); }
         }
 
+        public IList<WinApp> FilteredInstalledApps
+        {
+            get { return this._filteredInstalledApps; }
+            set { this.Set(() => this.FilteredInstalledApps, ref this._filteredInstalledApps, value); }
+        }
+
+        public string QueryString
+        {
+            get { return this._queryString; }
+            set
+            {
+                this.Set(() => this.QueryString, ref this._queryString, value);
+                this.FilterAppsAsync(value);
+            }
+        }
+
+        private Task FilterAppsAsync(string query)
+        {
+            return Task.Run(() =>
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    this.FilteredInstalledApps = this.InstalledApps;
+                    return;
+                }
+
+                var filtered = this.InstalledApps
+                    .Where(x => x.PackageName.ToLowerInvariant().Contains(query.ToLowerInvariant()))
+                    .ToList();
+                this.FilteredInstalledApps = filtered;
+            });
+        }
+
         public async Task InitializeAsync()
         {
             var device = this._navigationService.NavigationParameter as DeployTargetDevice;
@@ -89,11 +160,14 @@ namespace WinAppDeploy.GUI.ViewModels
             this.IsBusy = true;
             var apps = await this._deployService.GetInstalledAppsAsync(this.Device);
             this.InstalledApps = apps;
+            await this.FilterAppsAsync(string.Empty);
             this.IsBusy = false;
         }
 
         private DeployTargetDevice _device;
         private IList<WinApp> _installedApps;
+        private IList<WinApp> _filteredInstalledApps;
+        private string _queryString;
         private WinApp _selectedApp;
     }
 }

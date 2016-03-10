@@ -94,6 +94,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Messages\BusyMessage.cs" />
+    <Compile Include="Models\CmdResult.cs" />
     <Compile Include="Services\IDeployService.cs" />
     <Compile Include="Services\INavigationService.cs" />
     <Compile Include="Services\NavigationService.cs" />

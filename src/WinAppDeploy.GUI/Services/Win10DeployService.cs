@@ -13,6 +13,8 @@ namespace WinAppDeploy.GUI.Services
 {
     public class Win10DeployService : IDeployService
     {
+        public CmdResult LastCmdRunResukt { get; private set; }
+
         public async Task<bool> IsSDKInstalledAsync()
         {
             try
@@ -34,7 +36,7 @@ namespace WinAppDeploy.GUI.Services
                 );
 
             // Sanitize string
-            var sanizited = result.CleanHeader().CleanFooter();
+            var sanizited = result.StandarOutput.CleanHeader().CleanFooter();
 
             // Parse lines
             var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
@@ -57,7 +59,7 @@ namespace WinAppDeploy.GUI.Services
                 "list",
                 $"-ip {device.IP}");
 
-            var sanizited = result.CleanHeader().CleanFooter().CleanListingHeader().CleanListingFooter().Trim();
+            var sanizited = result.StandarOutput.CleanHeader().CleanFooter().CleanListingHeader().CleanListingFooter().Trim();
 
             var lines = Regex.Split(sanizited, "\\n", RegexOptions.CultureInvariant);
 
@@ -73,29 +75,45 @@ namespace WinAppDeploy.GUI.Services
 
         public async Task InstallAppAsync(string filePath, DeployTargetDevice device)
         {
-            var result = await this.RunWinAppDeployCmdAsync(
-                "install",
-                $"-file {filePath}",
-                $"-ip {device.IP}",
-                $"-guid {device.Guid}" //,
-                //$"-pin {pin}"
-                );
+            try
+            {
+                var result = await this.RunWinAppDeployCmdAsync(
+              "install",
+              $"-file \"{filePath}\"",
+              $"-ip {device.IP}"//,
+                                //$"-guid {device.Guid}" //,
+                                //$"-pin {pin}"
+              );
 
-            // TODO: Process output
-            var sanizited = result.CleanHeader().CleanFooter();
-            // TODO: Parse devices
+                // TODO: Process output
+                var sanizited = result.StandarOutput.CleanHeader().CleanFooter();
+                // TODO: Parse devices
+                if (!sanizited.Contains("Remote action succeeded"))
+                {
+                    var error = sanizited.GetInstallError();
+                    throw new Exception(error);
+                }
+            }
+            catch (Exception ex)
+            {
+                var aex = 5;
+                throw;
+            }
         }
 
-        public async Task UnistallAppAsync(string filePath, DeployTargetDevice device)
+     
+
+        public async Task UnistallAppAsync(WinApp app, DeployTargetDevice device)
         {
             var result = await this.RunWinAppDeployCmdAsync(
                 "uninstall",
-                $"-file {filePath}",
-                $"-package {device.IP}"
+                $"-package \"{app.PackageName}\"",
+                $"-ip {device.IP}"
                 );
 
             // TODO: Process output
-            var sanizited = result.CleanHeader().CleanFooter();
+            var success = result.StandarOutput.IsCmdOperationSuccess();
+            var sanizited = result.StandarOutput.CleanHeader().CleanFooter();
             // TODO: Parse devices
         }
 
@@ -108,7 +126,7 @@ namespace WinAppDeploy.GUI.Services
                 );
 
             // TODO: Process output
-            var sanizited = result.CleanHeader().CleanFooter();
+            var sanizited = result.StandarOutput.CleanHeader().CleanFooter();
             // TODO: Parse devices
         }
 
@@ -132,30 +150,47 @@ namespace WinAppDeploy.GUI.Services
             return "x86";
         }
 
-        private Task<string> RunWinAppDeployCmdAsync(params string[] arguments)
+        private Task<CmdResult> RunWinAppDeployCmdAsync(params string[] arguments)
         {
             return Task.Run(() =>
             {
-                var defaultPath = @"C:\Program Files (x86)\Windows Kits\10\bin\x86";
-                var execName = "WinAppDeployCmd.exe";
-
-                var cmdArguments = string.Join(" ", arguments);
-
-                var proc = new Process
+                try
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = Path.Combine(defaultPath, execName),
-                        Arguments = cmdArguments,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    }
-                };
+                    var defaultPath = @"C:\Program Files (x86)\Windows Kits\10\bin\x86";
+                    var execName = "WinAppDeployCmd.exe";
 
-                proc.Start();
-                var output = proc.StandardOutput.ReadToEnd();
-                return output;
+                    var cmdArguments = string.Join(" ", arguments);
+
+                    var proc = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = Path.Combine(defaultPath, execName),
+                            Arguments = cmdArguments,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true
+                        }
+                    };
+
+                    proc.Start();
+                    //proc.WaitForExit();
+
+                    var result = new CmdResult
+                    {
+                        //ExitCode = proc.ExitCode,
+                        StandarOutput = proc.StandardOutput?.ReadToEnd() ?? string.Empty,
+                        ErrorOutput = proc.StandardError?.ReadToEnd() ?? string.Empty
+                    };
+                    this.LastCmdRunResukt = result;
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    var a = 5;
+                    throw;
+                }
             });
         }
     }
